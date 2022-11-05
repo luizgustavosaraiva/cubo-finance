@@ -35,6 +35,19 @@
                 "variables": false
             }
         ],
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "interface",
+                "format": [
+                    "PascalCase"
+                ],
+                "custom": {
+                    "regex": "^I[A-Z]",
+                    "match": true
+                }
+            }
+        ],
         "@typescript-eslint/no-magic-numbers": [
             "error",
             {

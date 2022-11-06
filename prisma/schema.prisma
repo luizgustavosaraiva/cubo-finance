@@ -15,20 +15,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           String @id @default(uuid())
+  email        String @unique
+  profileImage String
+
+  expenses Expense[]
+  cards    Card[]
+}
+
+model Card {
+  id       String  @id @default(uuid())
+  name     String
+  isDebit  Boolean @default(false)
+  isCredit Boolean @default(false)
+  userId   String
+
+  owner User @relation(fields: [userId], references: [id])
+}
+
 model PaymentMethod {
-  id                     Int       @id @default(autoincrement())
-  title                  String
-  expenseParticipatingAt Expense[]
+  id        Int    @id @default(autoincrement())
+  title     String
+  expenseId Int?
+
+  Expense Expense? @relation(fields: [expenseId], references: [id])
 }
 
 model Expense {
-  id                 String   @id @default(uuid())
-  title              String
-  isInstallment      Boolean
-  installmentsNumber Int
-  dueDate            DateTime
-  createdAt          DateTime @default(now())
-  paymentMethodId    Int
+  id                  Int      @id @default(autoincrement())
+  title               String
+  description         String
+  isInstallment       Boolean
+  installmentsNumber  Int
+  amount              Decimal
+  dueDate             DateTime
+  createdAt           DateTime @default(now())
+  expirationWarningId String?
+  userId              String
 
-  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  expirationWarning ExpirationWarning?
+  owner             User               @relation(fields: [userId], references: [id])
+  paymentMethods    PaymentMethod[]
+}
+
+model ExpirationWarning {
+  id        String @id @default(uuid())
+  daysLeft  Int
+  expenseId Int    @unique
+
+  Expense Expense @relation(fields: [expenseId], references: [id])
 }

@@ -16,9 +16,9 @@ datasource db {
 }
 
 model User {
-  id           String @id @default(uuid())
-  email        String @unique
-  profileImage String
+  id           String  @id @default(uuid())
+  email        String  @unique
+  profileImage String?
 
   expenses Expense[]
   cards    Card[]
@@ -35,11 +35,8 @@ model Card {
 }
 
 model PaymentMethod {
-  id        Int    @id @default(autoincrement())
-  title     String
-  expenseId Int?
-
-  Expense Expense? @relation(fields: [expenseId], references: [id])
+  id    Int    @id @default(autoincrement())
+  title String @unique
 }
 
 model Expense {
@@ -49,6 +46,7 @@ model Expense {
   isInstallment       Boolean
   installmentsNumber  Int
   amount              Decimal
+  paymentMethodId     Int
   dueDate             DateTime
   createdAt           DateTime @default(now())
   expirationWarningId String?
@@ -56,7 +54,6 @@ model Expense {
 
   expirationWarning ExpirationWarning?
   owner             User               @relation(fields: [userId], references: [id])
-  paymentMethods    PaymentMethod[]
 }
 
 model ExpirationWarning {
@@ -64,5 +61,5 @@ model ExpirationWarning {
   daysLeft  Int
   expenseId Int    @unique
 
-  Expense Expense @relation(fields: [expenseId], references: [id])
+  expense Expense @relation(fields: [expenseId], references: [id])
 }

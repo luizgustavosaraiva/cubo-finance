@@ -1,35 +1,41 @@
+import { faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // const moneyPaymentMethod = await prisma.paymentMethod.create({
-  //   data: { title: 'Dinheiro' },
-  // });
+  const DUE_DATE_IN_DAYS = 10;
+  const user = await prisma.user.upsert({
+    where: { email: 'Cristobal_Johnston@gmail.com' },
+    create: {
+      email: 'Cristobal_Johnston@gmail.com',
+      profileImage: faker.image.avatar(),
+    },
+    update: {},
+  });
 
-  // const creditCardPaymentMethod = await prisma.paymentMethod.create({
-  //   data: { title: 'Cartão de crédito' },
-  // });
+  const creditCardPaymentMethod = await prisma.paymentMethod.upsert({
+    where: { title: 'Cartão de crédito' },
+    create: {
+      title: 'Cartão de crédito',
+    },
+    update: {},
+  });
 
-  // const debitCardPaymentMethod = await prisma.paymentMethod.create({
-  //   data: { title: 'Cartão de débito' },
-  // });
-
-  // const bankSlipPaymentMethod = await prisma.paymentMethod.create({
-  //   data: { title: 'Boleto' },
-  // });
-
-  // await prisma.expense.create({
-  //   data: {
-  //     dueDate: new Date('2022-11-10').toISOString(),
-  //     createdAt: new Date().toISOString(),
-  //     installmentsNumber: 1,
-  //     isInstallment: true,
-      
-  //     paymentMethodId: moneyPaymentMethod.id,
-  //     title: 'Conta de água',
-  //   },
-  // });
+  await prisma.expense.upsert({
+    where: { id: 1 },
+    create: {
+      amount: faker.finance.amount(),
+      description: faker.lorem.paragraph(),
+      dueDate: faker.date.soon(DUE_DATE_IN_DAYS).toISOString(),
+      isInstallment: true,
+      installmentsNumber: faker.datatype.number({ max: 20 }),
+      title: faker.lorem.words(DUE_DATE_IN_DAYS),
+      userId: user.id,
+      paymentMethodId: creditCardPaymentMethod.id,
+    },
+    update: {},
+  });
 }
 
 main();
